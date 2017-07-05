@@ -1,0 +1,24 @@
+<div class="viewport posts">
+
+  <div class="flip-container">
+    <div class="flipper">
+      <div class="front">
+        <ul class="posts">
+          {{#each list}}
+            <li><a href="{{ this.path }}">{{ this.title }}</a></li>
+          {{/each}}
+        </ul>
+      </div>
+      <div class="back">
+        <pre><code class="circ" id="code">{{{code}}}</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <a class="github" href="https://github.com/hsiaosiyuan0"><i class="fa fa-github"></i></a>
+  </div>
+
+  <a class="exec" href="">driven by circ: {{time}}</a>
+</div>
+

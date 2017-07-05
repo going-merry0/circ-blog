@@ -1,0 +1,266 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: STFangSong, Helvetica, Arial, Vernada, Tahoma, STXihei, "Microsoft YaHei", "Songti SC", SimSun, Heiti, sans-serif;
+  font-size: 18px;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.viewport.post ul {
+  list-style-type: disc;
+}
+
+button,
+input[type=text] {
+  outline: none;
+}
+
+::-webkit-input-placeholder {
+  /* WebKit, Blink, Edge */
+  font-family: STFangSong, Helvetica, Arial, Vernada, Tahoma, STXihei, "Microsoft YaHei", "Songti SC", SimSun, Heiti, sans-serif;
+  color: #c8c8c8;
+}
+
+:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  font-family: STFangSong, Helvetica, Arial, Vernada, Tahoma, STXihei, "Microsoft YaHei", "Songti SC", SimSun, Heiti, sans-serif;
+  color: #c8c8c8;
+  opacity: 1;
+}
+
+::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  font-family: STFangSong, Helvetica, Arial, Vernada, Tahoma, STXihei, "Microsoft YaHei", "Songti SC", SimSun, Heiti, sans-serif;
+  color: #c8c8c8;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  font-family: STFangSong, Helvetica, Arial, Vernada, Tahoma, STXihei, "Microsoft YaHei", "Songti SC", SimSun, Heiti, sans-serif;
+  color: #c8c8c8;
+}
+
+.form-control {
+  min-height: 30px;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 0 8px;
+  color: #333;
+  vertical-align: middle;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+}
+
+.form-control:focus {
+  border-color: #51a7e8;
+  outline: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075), 0 0 5px rgba(81, 167, 232, 0.5)
+}
+
+.viewport.posts > header {
+  z-index: 3;
+  padding-top: 18px;
+  padding-bottom: 18px;
+  background-color: #fff;
+  background-clip: padding-box;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.075);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.viewport.posts > header > .inner {
+  position: relative;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.viewport.posts > header > .inner > * {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.viewport.posts > header > .inner > ul a {
+  color: #4183c4;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.viewport.posts > header > .inner > ul a:hover {
+  text-decoration: underline;
+}
+
+.viewport.posts > header > .inner > form {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+.viewport.posts > ul {
+  display: block;
+  width: 60%;
+  background-color: #fff;
+  border-radius: 3px;
+  margin: 30px auto;
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 0 #ddd;
+}
+
+@media (max-width: 1024px) {
+  .viewport.posts > ul {
+    width: 80%;
+  }
+}
+
+ul.posts > li {
+  display: block;
+  border-bottom: 1px solid #eee;
+}
+
+ul.posts > li:last-child {
+  border: 0;
+}
+
+ul.posts > li a {
+  display: block;
+  color: #4183c4;
+  text-decoration: none;
+  padding: 10px 15px;
+  font-size: 16px;
+}
+
+ul.posts > li a:hover {
+  text-decoration: underline;
+  background-color: #f2f8ff;
+}
+
+ul.posts > li.title {
+  padding: 10px 15px;
+  font-size: 18px;
+  color: #325d72;
+  background-color: #fafafa;
+}
+
+.markdown-body {
+  font-family: STFangSong, Helvetica, Arial, Vernada, Tahoma, STXihei, "Microsoft YaHei", "Songti SC", SimSun, Heiti, sans-serif;
+}
+
+.viewport.post {
+  padding: 20px 0;
+}
+
+.viewport.post > .announce {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.viewport .bottom {
+  width: 100%;
+  position: absolute;
+  bottom: 10px;
+  text-align: center;
+}
+
+.viewport .bottom a,
+.viewport .exec {
+  color: #222;
+  text-decoration: none;
+}
+
+.viewport .bottom .github {
+  font-size: 20px;
+}
+
+.viewport .exec {
+  font-size: 12px;
+  float: right;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
+/* entire container, keeps perspective */
+.flip-container {
+  perspective: 1000px;
+}
+
+/* flip the pane when hovered */
+.flip-container.hover .flipper {
+  transform: rotateY(180deg);
+}
+
+.flip-container .front, .flip-container .back {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  border-radius: 5px;
+  overflow: auto;
+}
+
+.flip-container {
+  margin: 50px auto 0;
+}
+
+.flip-container, .front, .back {
+  width: 60vw;
+  height: 70vh;
+}
+
+/* flip speed goes here */
+.flipper {
+  transition: 0.6s;
+  transform-style: preserve-3d;
+
+  position: relative;
+}
+
+/* hide back of pane during swap */
+.front, .back {
+  backface-visibility: hidden;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* front pane, placed above back */
+.front {
+  z-index: 2;
+  /* for firefox 31 */
+  transform: rotateY(0deg);
+}
+
+/* back, initially hidden pane */
+.back {
+  transform: rotateY(180deg);
+}
+
+.flip-container.flip .flipper {
+  transform: rotateY(180deg);
+}
+
+/*  UPDATED! flip the pane when hovered */
+.flip-container.flip .back {
+  transform: rotateY(0deg);
+}
+
+.flip-container.flip .front {
+  transform: rotateY(180deg);
+}
+
+/*  UPDATED! front pane, placed above back */
+.front {
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+
+pre > code {
+  font-family: "Source Code Pro", "Sans Mono", "Consolas", "Courier", monospace;
+  font-size: 13px;
+}

@@ -1,0 +1,162 @@
+let express = jsModule("express")
+let app = callJs(null, express)
+
+// handle static resources
+let assets = callJs(express, express.static, callJs(jsGlobal.process, jsGlobal.process.cwd) + "/assets")
+callJs(app, app.use, "/assets", assets)
+
+// setup view engine
+let handlebars = jsModule("express-handlebars")
+let hbs = callJs(handlebars, handlebars.create, {
+  "extname": ".hbs",
+  "defaultLayout": "main",
+  "partialsDir": [
+    "views/partials/"
+  ]
+})
+
+callJs(app, app.engine, ".hbs", hbs.engine)
+callJs(app, app.set, "view engine", ".hbs")
+
+// setup github api
+let fs = jsModule("fs")
+let ini = jsModule("ini")
+
+let fileContent = callJsAsync(fs, fs.readFile, "./config.ini", "utf8")
+let config = callJs(ini, ini.parse, fileContent);
+
+let GitHubApi = jsModule("github")
+let github = newJsObj(GitHubApi, {
+  "protocol": "https",
+  "host": "api.github.com",
+})
+
+callJs(github, github.authenticate, {
+  "type": "basic",
+  "username": config.github.username,
+  "password": config.github.password
+})
+
+// setup request handlers
+let selfCode = null
+callJs(app, app.get, "/", (req, res) -> {
+  timeBegin()
+  if selfCode == null then selfCode = callJsAsync(fs, fs.readFile, "./index.circ", "utf8")
+  let list = getPostDirTree()
+  let elapsed = timeEnd()
+  let time = ""
+  if elapsed[0] != 0 then time = elapsed[0] + "s "
+  time = time + elapsed[1] / 1000000 + "ms"
+  callJs(res, res.render, "home", {
+    "title": "home",
+    "list": list,
+    "time": time,
+    "code": selfCode
+  })
+})
+
+callJs(app, app.get, regexp("/post/.*"), (req, res) -> {
+  callJs(res, res.render, "post", {
+    "content": getPostContent(req.originalUrl, "html")
+  })
+})
+
+let port = 3000
+callJs(app, app.listen, port, () -> {
+  println("app is running at: " + port)
+})
+
+fun getPostDirSha() {
+  let resp = callJsAsync(github.repos, github.repos.getContent, {
+    "owner": config.github.username,
+    "repo": config.github.repo,
+    "path": ""
+  })
+  let postDir = null
+  for item in resp.data {
+    if item.name == "post" then {
+      postDir = item
+      break
+    }
+  }
+  postDir.sha
+}
+
+let postsCache = null
+fun getPostDirTree() {
+  if postsCache != null then postsCache else {
+    let sha = getPostDirSha()
+    let resp = callJsAsync(github.gitdata, github.gitdata.getTree, {
+      "owner": config.github.username,
+      "repo": config.github.repo,
+      "sha": sha,
+      "recursive": true
+    })
+    let expect = 0
+    let path = ""
+    let posts = for item in resp.data.tree {
+      if item.type == "blob" then {
+        expect = item.path.length - 3
+        if callJs(item.path, item.path.indexOf, ".md") == expect then {
+          path = "post/" + item.path
+          {
+            "path": path,
+            "title": getPostTitle(path)
+          }
+        } else discard
+      } else discard
+    }
+    postsCache = posts
+    posts
+  }
+}
+
+fun getPostTitle(path) {
+  let text = callJsAsync(github.repos, github.repos.getContent, {
+    "owner": config.github.username,
+    "repo": config.github.repo,
+    "path": path,
+    "headers": {
+      "Accept": "application/vnd.github.v3.raw+json"
+    }
+  }).data
+
+  let reg = regexp("#\\s*(.*)\n*")
+  let matches = callJs(text, text.match, reg)
+  if matches != null then matches[1] else ""
+}
+
+let postContentCache = newJsObj(jsGlobal.Object)
+fun getPostContent(path, type) {
+  type = type || "raw"
+  let key = path + type
+  let cache = postContentCache[key]
+  if cache != undefined then cache else {
+    let text = null
+    try(
+      () -> {
+        text = callJsAsync(github.repos, github.repos.getContent, {
+          "owner": config.github.username,
+          "repo": config.github.repo,
+          "path": path,
+          "headers": {
+            "Accept": "application/vnd.github.v3." + type + "+json"
+          }
+        }).data
+        postContentCache[key] = text
+        text
+      },
+      true, () -> { text }
+    )
+  }
+}
+
+let startTime = null
+let process = jsGlobal.process
+fun timeBegin() {
+  startTime = callJs(process, process.hrtime)
+}
+
+fun timeEnd() {
+  callJs(process, process.hrtime, startTime)
+}
