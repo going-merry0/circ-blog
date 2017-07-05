@@ -184,7 +184,7 @@ ul.posts > li.title {
   float: right;
   position: absolute;
   right: 10px;
-  bottom: 10px;
+  top: 10px;
 }
 
 /* entire container, keeps perspective */
