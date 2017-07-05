@@ -113,7 +113,7 @@ fun getPostDirTree() {
 }
 
 fun getPostTitle(path) {
-  let text = getPostContent(path)
+  let text = getPostContent(path, null)
   let reg = regexp("#\\s*(.*)\n*")
   let matches = callJs(text, text.match, reg)
   if matches != null then matches[1] else ""
