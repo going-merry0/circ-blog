@@ -2,7 +2,8 @@ let express = jsModule("express")
 let app = callJs(null, express)
 
 // handle static resources
-let assets = callJs(express, express.static, callJs(jsGlobal.process, jsGlobal.process.cwd) + "/assets")
+let process = jsGlobal.process
+let assets = callJs(express, express.static, callJs(process, process.cwd) + "/assets")
 callJs(app, app.use, "/assets", assets)
 
 // setup view engine
@@ -112,15 +113,7 @@ fun getPostDirTree() {
 }
 
 fun getPostTitle(path) {
-  let text = callJsAsync(github.repos, github.repos.getContent, {
-    "owner": config.github.username,
-    "repo": config.github.repo,
-    "path": path,
-    "headers": {
-      "Accept": "application/vnd.github.v3.raw+json"
-    }
-  }).data
-
+  let text = getPostContent(path)
   let reg = regexp("#\\s*(.*)\n*")
   let matches = callJs(text, text.match, reg)
   if matches != null then matches[1] else ""
@@ -152,7 +145,6 @@ fun getPostContent(path, type) {
 }
 
 let startTime = null
-let process = jsGlobal.process
 fun timeBegin() {
   startTime = callJs(process, process.hrtime)
 }
