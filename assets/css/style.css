@@ -190,6 +190,7 @@ ul.posts > li.title {
 /* entire container, keeps perspective */
 .flip-container {
   perspective: 1000px;
+  -webkit-perspective: 1000px;
 }
 
 /* flip the pane when hovered */
@@ -216,6 +217,7 @@ ul.posts > li.title {
 .flipper {
   transition: 0.6s;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 
   position: relative;
 }
@@ -223,6 +225,7 @@ ul.posts > li.title {
 /* hide back of pane during swap */
 .front, .back {
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 
   position: absolute;
   top: 0;
