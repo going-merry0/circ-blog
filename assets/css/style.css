@@ -264,3 +264,12 @@ pre > code {
   font-family: "Source Code Pro", "Sans Mono", "Consolas", "Courier", monospace;
   font-size: 13px;
 }
+
+#viewSrc{
+  display: block;
+  color: #222;
+  font-size: 13px;
+  float: right;
+  margin-right: 10px;
+  padding: 5px 0;
+}
