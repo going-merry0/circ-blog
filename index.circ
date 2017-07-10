@@ -1,14 +1,14 @@
 let express = jsModule("express")
-let app = callJs(null, express)
+let app = express()
 
 // handle static resources
 let process = jsGlobal.process
-let assets = callJs(express, express.static, callJs(process, process.cwd) + "/assets")
-callJs(app, app.use, "/assets", assets)
+let assets = express.static(process.cwd() + "/assets")
+app.use("/assets", assets)
 
 // setup view engine
 let handlebars = jsModule("express-handlebars")
-let hbs = callJs(handlebars, handlebars.create, {
+let hbs = handlebars.create({
   "extname": ".hbs",
   "defaultLayout": "main",
   "partialsDir": [
@@ -16,15 +16,16 @@ let hbs = callJs(handlebars, handlebars.create, {
   ]
 })
 
-callJs(app, app.engine, ".hbs", hbs.engine)
-callJs(app, app.set, "view engine", ".hbs")
+app.engine(".hbs", hbs.engine)
+app.set("view engine", ".hbs")
 
 // setup github api
 let fs = jsModule("fs")
 let ini = jsModule("ini")
 
+// call the async method via a sync style
 let fileContent = callJsAsync(fs, fs.readFile, "./config.ini", "utf8")
-let config = callJs(ini, ini.parse, fileContent);
+let config = ini.parse(fileContent)
 
 let GitHubApi = jsModule("github")
 let github = newJsObj(GitHubApi, {
@@ -32,7 +33,7 @@ let github = newJsObj(GitHubApi, {
   "host": "api.github.com",
 })
 
-callJs(github, github.authenticate, {
+github.authenticate({
   "type": "basic",
   "username": config.github.username,
   "password": config.github.password
@@ -40,15 +41,16 @@ callJs(github, github.authenticate, {
 
 // setup request handlers
 let selfCode = null
-callJs(app, app.get, "/", (req, res) -> {
+app.get("/", (req, res) -> {
   timeBegin()
-  if selfCode == null then selfCode = callJsAsync(fs, fs.readFile, "./index.circ", "utf8")
+  // call the async method via a sync style
+  selfCode = selfCode || callJsAsync(fs, fs.readFile, "./index.circ", "utf8")
   let list = getPostDirTree()
   let elapsed = timeEnd()
   let time = ""
   if elapsed[0] != 0 then time = elapsed[0] + "s "
   time = time + elapsed[1] / 1000000 + "ms"
-  callJs(res, res.render, "home", {
+  res.render("home", {
     "title": "home",
     "list": list,
     "time": time,
@@ -56,18 +58,19 @@ callJs(app, app.get, "/", (req, res) -> {
   })
 })
 
-callJs(app, app.get, regexp("/post/.*"), (req, res) -> {
-  callJs(res, res.render, "post", {
+app.get(regexp("/post/.*"), (req, res) -> {
+  res.render("post", {
     "content": getPostContent(req.originalUrl, "html")
   })
 })
 
 let port = 3000
-callJs(app, app.listen, port, () -> {
+app.listen(port, () -> {
   println("app is running at: " + port)
 })
 
 fun getPostDirSha() {
+  // call the async method via a sync style
   let resp = callJsAsync(github.repos, github.repos.getContent, {
     "owner": config.github.username,
     "repo": config.github.repo,
@@ -85,8 +88,11 @@ fun getPostDirSha() {
 
 let postsCache = null
 fun getPostDirTree() {
-  if postsCache != null then postsCache else {
+  if postsCache != null
+  then postsCache
+  else {
     let sha = getPostDirSha()
+    // call the async method via a sync style
     let resp = callJsAsync(github.gitdata, github.gitdata.getTree, {
       "owner": config.github.username,
       "repo": config.github.repo,
@@ -96,16 +102,20 @@ fun getPostDirTree() {
     let expect = 0
     let path = ""
     let posts = for item in resp.data.tree {
-      if item.type == "blob" then {
+      if item.type != "blob"
+      then discard
+      else {
         expect = item.path.length - 3
-        if callJs(item.path, item.path.indexOf, ".md") == expect then {
-          path = "post/" + item.path
-          {
-            "path": path,
-            "title": getPostTitle(path)
-          }
-        } else discard
-      } else discard
+        if item.path.indexOf(".md") != expect
+        then discard
+        else {
+         path = "post/" + item.path
+         {
+           "path": path,
+           "title": getPostTitle(path)
+         }
+        }
+      }
     }
     postsCache = posts
     posts
@@ -115,7 +125,7 @@ fun getPostDirTree() {
 fun getPostTitle(path) {
   let text = getPostContent(path, null)
   let reg = regexp("#\\s*(.*)\n*")
-  let matches = callJs(text, text.match, reg)
+  let matches = text.match(reg)
   if matches != null then matches[1] else ""
 }
 
@@ -128,6 +138,7 @@ fun getPostContent(path, type) {
     let text = null
     try(
       () -> {
+        // call the async method via a sync style
         text = callJsAsync(github.repos, github.repos.getContent, {
           "owner": config.github.username,
           "repo": config.github.repo,
@@ -146,9 +157,9 @@ fun getPostContent(path, type) {
 
 let startTime = null
 fun timeBegin() {
-  startTime = callJs(process, process.hrtime)
+  startTime = process.hrtime()
 }
 
 fun timeEnd() {
-  callJs(process, process.hrtime, startTime)
+  process.hrtime(startTime)
 }
