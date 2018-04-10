@@ -238,6 +238,7 @@ ul.posts > li.title {
   z-index: 2;
   /* for firefox 31 */
   transform: rotateY(0deg);
+  background-color: #fff;
 }
 
 /* back, initially hidden pane */
